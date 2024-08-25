@@ -1,0 +1,1 @@
+- [ ] Add soft delete to all tables.
