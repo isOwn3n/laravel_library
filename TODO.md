@@ -1,1 +1,4 @@
-- [ ] Add soft delete to all tables.
+- [x] Add soft delete to all tables.
+- [ ] Write complex logics in service.
+- [ ] After Deleting Membership Plan, Change All Users Plan to Free.
+- [x] Dont Let Admin Delete Free Plan

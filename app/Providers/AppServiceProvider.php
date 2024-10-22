@@ -10,6 +10,10 @@ use App\Repositories\Borrowing\BorrowingRepository;
 use App\Repositories\Borrowing\BorrowingRepositoryInterface;
 use App\Repositories\MembershipPlan\MembershipPlanRepository;
 use App\Repositories\MembershipPlan\MembershipPlanRepositoryInterface;
+use App\Repositories\Payment\PaymentRepository;
+use App\Repositories\Payment\PaymentRepositoryInterface;
+use App\Repositories\Reservation\ReservationRepository;
+use App\Repositories\Reservation\ReservationRepositoryInterface;
 use App\Repositories\User\UserRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
@@ -40,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
                 );
             },
         );
+        $this->app->bind(PaymentRepositoryInterface::class, PaymentRepository::class);
+        $this->app->bind(ReservationRepositoryInterface::class, ReservationRepository::class);
     }
 
     /**

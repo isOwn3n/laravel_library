@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\Borrowing\BorrowingRepository;
+use App\Services\BorrowingService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,10 +14,12 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 class BorrowingController extends Controller
 {
     protected BorrowingRepository $repository;
+    protected BorrowingService $service;
 
-    public function __construct(BorrowingRepository $repository)
+    public function __construct(BorrowingRepository $repository, BorrowingService $service)
     {
         $this->repository = $repository;
+        $this->service = $service;
     }
 
     public function index(Request $request): JsonResponse
@@ -32,7 +35,6 @@ class BorrowingController extends Controller
     {
         $rules = [
             'book_id' => 'required|integer|exists:books,id',
-            'due_date' => 'required|date',
             'quantity' => 'sometimes|integer',
         ];
         $validator = Validator::make($request->all(), $rules);
@@ -44,14 +46,23 @@ class BorrowingController extends Controller
 
         try {
             $validatedData = $validator->validated();
-            if (!array_key_exists('quantity', $validatedData)) {
+            if (!array_key_exists('quantity', $validatedData) || $validatedData['quantity'] === 0)
                 $validatedData['quantity'] = 1;
-            }
-            $validatedData['user_id'] = $request->user()->id;
+
+            $user = $request->user();
+            $total_borrowings = $this->repository->getCountByUser($user->id);
+            $validatedData = $this->service
+                ->handleBorrowingUserValidation($validatedData, $total_borrowings, $user);
+
+            if ($validatedData['type'] === 'error')
+                return response()->json(
+                    $validatedData['data'], $validatedData['status'],
+                );
+            $validatedData = $validatedData['data'];
             $borrow = $this->repository->create($validatedData);
             if ($borrow)
                 return response()->json([
-                    "message" => "Book was created.",
+                    "message" => "Book was borrowed.",
                     "data" => $borrow
                 ], ResponseAlias::HTTP_CREATED);
             return response()->json([
@@ -66,7 +77,7 @@ class BorrowingController extends Controller
 
     public function returned(int $id): JsonResponse
     {
-        $borrow = $this->repository->find($id);
+        $borrow = $this->repository->getById($id);
 
         if (!$borrow || $borrow->returned_at)
             return response()->json([

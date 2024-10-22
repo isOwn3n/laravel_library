@@ -11,10 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('membership_plan_id')
-                ->nullable()
-                ->constrained('membership_plans')
-                ->onDelete('set null');
+            $table->timestamp('plan_expires_at')->nullable();
+            $table->boolean('notified')->default(false);
         });
     }
 
@@ -24,7 +22,8 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('membership_plan_id');
+            $table->dropColumn('plan_expires_at');
+            $table->dropColumn('notified');
         });
     }
 };

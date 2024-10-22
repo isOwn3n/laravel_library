@@ -23,7 +23,7 @@ class CategoryRepository implements CategoryRepositoryInterface
         return $this->model->orderBy($orderCol, $is_asc ? 'asc' : 'desc')->paginate($count);
     }
 
-    public function find(int $id)
+    public function getById(int $id)
     {
         return $this->model->find($id);
     }
@@ -33,7 +33,7 @@ class CategoryRepository implements CategoryRepositoryInterface
         return $this->model->create($data);
     }
 
-    public function update(array $data, int $id): bool
+    public function update(int $id, array $data): bool
     {
         return $this->model->where('id', $id)->update($data);
     }

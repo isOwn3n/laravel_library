@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: '',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias(['borrowing.check_admin' => CheckAdmin::class]);
+        $middleware->alias(['check_admin' => CheckAdmin::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (AuthenticationException $e, Request $request) {

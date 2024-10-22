@@ -12,11 +12,12 @@ return new class extends Migration {
     {
         Schema::create('membership_plans', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->integer('max_books_allowed');
-            $table->integer('borrow_duration_days'); // Max days a member can borrow a book
-            $table->decimal('price', 8, 2)->nullable(); // Price for the membership plan
+            $table->integer('borrow_duration_days');
+            $table->integer('price');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

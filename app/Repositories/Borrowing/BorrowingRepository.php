@@ -39,9 +39,20 @@ class BorrowingRepository implements BorrowingRepositoryInterface
         return $this->model->orderBy($orderCol, $is_asc ? 'asc' : 'desc')->paginate($count);
     }
 
-    public function find($id)
+    public function getById($id)
     {
         return $this->model->find($id);
+    }
+
+    public function getCountByUser(int $user_id): int
+    {
+        $user = $this->userRepository->getById($user_id);
+        $borrowings = $user->borrowings;
+        $total = 0;
+        foreach ($borrowings as $borrowing) {
+            $total += $borrowing->quantity;
+        }
+        return $total;
     }
 
     public function findByUser(int $user_id, int $perPage, string $orderCol = 'id', bool $is_asc = true)
@@ -89,7 +100,7 @@ class BorrowingRepository implements BorrowingRepositoryInterface
         return [];
     }
 
-    public function create(array $data)
+    public function create(array $data): Borrowing|false
     {
         $quantity = $data["quantity"];
         $can_borrow = $this->bookRepository->borrow($data['book_id'], $quantity);
@@ -112,8 +123,7 @@ class BorrowingRepository implements BorrowingRepositoryInterface
     {
         $quantity = $borrow->quantity;
         $can_return = $this->bookRepository->returned($borrow->book_id, $quantity);
-        if ($can_return)
-        {
+        if ($can_return) {
             $borrow->returned_at = Carbon::today()->toDateString();
             $borrow->save();
             return true;

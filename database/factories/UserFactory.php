@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\MembershipPlan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,12 +23,16 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $roles = ['admin', 'librarian', 'member'];
         return [
             'firstname' => fake()->firstName(),
             'lastname' => fake()->firstName(),
             'username' => fake()->userName(),
             'email' => fake()->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => $roles[array_rand($roles)],
+            'membership_plan_id' => MembershipPlan::all()->random()->id,
+            'plan_expires_at' => now()->addYear()
         ];
     }
 

@@ -20,9 +20,14 @@ class BookController extends Controller
         $this->repository = $repository;
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $books = $this->repository->paginate(16, 'created_at', false);
+        $search = $request->get('q', '');
+        $search_on = $request->get('field', '');
+        if (!empty($search))
+            $books = $this->repository->search($search, empty($search_on) ? 'title' : $search_on);
+        else
+            $books = $this->repository->paginate(16, 'created_at', false);
         return response()->json($books, ResponseAlias::HTTP_OK);
     }
 
@@ -40,7 +45,7 @@ class BookController extends Controller
             'isbn' => ['required', 'string', 'max:13', 'unique:books,isbn'],
             'category_id' => ['required', 'integer', 'exists:categories,id'],
             'quantity' => ['required', 'integer', 'min:1'],
-            'available_quantity' => ['required', 'integer', 'min:0', 'lte:quantity'],  // 'available_quantity' should be less than or equal to 'quantity'
+            'available_quantity' => ['required', 'integer', 'min:0', 'lte:quantity'],
             'description' => ['sometimes', 'nullable', 'string'],
         ];
         $validator = Validator::make($request->all(), $rules);
@@ -62,7 +67,6 @@ class BookController extends Controller
                 'message' => 'An error occurred while creating the book: ' . $e->getMessage(),
             ], ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
         }
-
     }
 
     /**
@@ -93,7 +97,7 @@ class BookController extends Controller
                 ResponseAlias::HTTP_UNPROCESSABLE_ENTITY
             );
         // Update By ID.
-//        $this->repository->update($book_id, $data);
+        //        $this->repository->update($book_id, $data);
 
         // Update By Slug.
         $this->repository->updateBySlug($slug, $data);

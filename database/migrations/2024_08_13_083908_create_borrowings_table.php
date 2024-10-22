@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->date('returned_at')->nullable();
             $table->integer('fine')->default(0); // Fine for late return
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

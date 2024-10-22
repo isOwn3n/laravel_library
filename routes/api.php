@@ -5,6 +5,8 @@ use App\Http\Controllers\API\v1\BookController;
 use App\Http\Controllers\API\v1\BorrowingController;
 use App\Http\Controllers\API\v1\CategoryController;
 use App\Http\Controllers\API\v1\MembershipPlanController;
+use App\Http\Controllers\API\v1\PaymentController;
+use App\Http\Controllers\API\v1\ReservationController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -21,13 +23,13 @@ Route::prefix('v1')->group(function () {
         Route::prefix('borrowing')->controller(BorrowingController::class)->group(function () {
             Route::get('', 'index')->name('borrowing-list');
             Route::post('', 'borrow')->name('borrowing-create');
-            Route::put('return/{id}', 'returned');
+            Route::put('return/{id}', 'returned')->name('borrowing-return');
             Route::get('category/{id}', 'getBorrowingsByCategory')
                 ->name('borrowing-get-by-category');
 
             Route::get('user/{id}', 'getBorrowingsByUser')->name('borrowing-get-by-user');
             Route::get('book/{id}', 'getBorrowingsByBook')->name('borrowing-get-by-book');
-        })->middleware('borrowing.check_admin');
+        })->middleware('check_admin');
 
         Route::prefix('category')->controller(CategoryController::class)->group(function () {
             Route::get('', 'index');
@@ -39,10 +41,21 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('membership-plan')->controller(MembershipPlanController::class)->group(function () {
             Route::get('', 'index');
-            Route::put('/{id}', 'index');
+            Route::put('/{id}', 'update');
             Route::post('', 'store');
             Route::delete('/{id}', 'destroy');
             Route::get('/users/{id}', 'getUsersById');
+        });
+
+        Route::prefix('payment')->controller(PaymentController::class)->group(function () {
+            Route::get('/me', 'getByUser');
+            Route::get('', 'index');
+        });
+
+        Route::prefix('reserve')->controller(ReservationController::class)->group(function () {
+            Route::get('/me', 'getByUser');
+            Route::get('', 'index');
+            Route::post('', 'store');
         });
 
         Route::prefix('auth')->controller(AuthController::class)->group(function () {

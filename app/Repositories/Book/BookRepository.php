@@ -3,6 +3,7 @@
 namespace App\Repositories\Book;
 
 use App\Models\Book;
+use Illuminate\Database\Eloquent\Collection;
 
 class BookRepository implements BookRepositoryInterface
 {
@@ -13,7 +14,7 @@ class BookRepository implements BookRepositoryInterface
         $this->model = $model;
     }
 
-    public function getAll()
+    public function all(): Collection
     {
         return $this->model->all();
     }
@@ -37,7 +38,6 @@ class BookRepository implements BookRepositoryInterface
     {
         $book = $this->getById($id);
         if ($book && $book->available_quantity >= $quantity) {
-            // Decrease the quantity by the specified amount
             $book->available_quantity = max(0, $book->available_quantity - $quantity);
             $book->save();
             return true;
@@ -84,5 +84,11 @@ class BookRepository implements BookRepositoryInterface
     public function update($id, array $data)
     {
         return $this->model->where('id', $id)->update($data);
+    }
+
+    // TODO: Convert $search_on to array
+    public function search(string $search, string $search_on)
+    {
+        return $this->model->where($search_on, 'like', "%$search%")->get();
     }
 }

@@ -26,6 +26,8 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'role',
         'membership_plan_id',
+        'plan_expires_at',
+        'notified',
     ];
 
     /**

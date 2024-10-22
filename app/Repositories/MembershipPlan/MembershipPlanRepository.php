@@ -37,7 +37,7 @@ class MembershipPlanRepository implements MembershipPlanRepositoryInterface
         return $this->model->create($data);
     }
 
-    public function update(array $data, int $id)
+    public function update(int $id, array $data)
     {
         return $this->model->where('id', $id)->update($data);
     }
@@ -46,4 +46,6 @@ class MembershipPlanRepository implements MembershipPlanRepositoryInterface
     {
         return $this->model->destroy($id);
     }
+
+    public function getById(int $id) {}
 }

@@ -41,6 +41,7 @@ class AuthController extends Controller
         $validated = $validator->validated();
 
         $validated['password'] = Hash::make($validated['password']);
+        $validated['membership_plan_id'] = 1;
 
 
         $user = $this->repository->create($validated);
@@ -82,6 +83,7 @@ class AuthController extends Controller
 
     public function refresh(): JsonResponse
     {
+        // TODO: Handle refresh by getting refresh token.
         return $this->respondWithToken(JWTAuth::refresh());
     }
 }

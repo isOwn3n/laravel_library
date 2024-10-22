@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->integer('available_quantity')->default(1); // Number of copies available for borrowing
             $table->text('description')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
